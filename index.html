@@ -649,15 +649,39 @@ img{-webkit-user-drag:none;user-select:none;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 /* ─── RESPONSIVE ─── */
 @media(max-width:420px){
-  body{padding:10px}
-  .face-inner{padding:18px 16px 22px}
+  body{padding:8px}
+  .face-inner{padding:14px 14px 18px}
   .profile .name{font-size:24px}
-  .profile .avatar{width:78px;height:78px}
-  .top-bar .company{font-size:12px}
-  .recs{padding:18px 16px}
-  .contacts .ci{width:38px;height:38px}
-  .ab{padding:10px 4px;font-size:10px}
-  .ab .ai{width:34px;height:34px;font-size:14px}
+  .profile .avatar{width:72px;height:72px}
+  .profile .avatar::before{inset:-5px}
+  .profile .avatar::after{inset:-2px}
+  .top-bar .company{font-size:11px}
+  .top-bar{padding:4px 2px;margin-bottom:4px}
+  .recs{padding:16px 14px}
+  .brand{margin-bottom:12px}
+  .brand .pill{font-size:10px;padding:3px 12px}
+  .profile .role{font-size:12px;margin-bottom:4px}
+  .profile .badge{font-size:10px;padding:2px 10px}
+  .profile .msg{font-size:12px;margin-top:6px}
+  .profile{margin-bottom:10px}
+  .contacts{gap:4px;margin-bottom:10px}
+  .contacts a{padding:3px 0;max-width:260px}
+  .contacts .ci{width:34px;height:34px;font-size:15px}
+  .contacts .cl .vv{font-size:13px}
+  .contacts .cl .ll{font-size:10px}
+  .contacts .cl .ss{font-size:10px}
+  .qr .frame{width:120px;height:120px;padding:6px}
+  .qr{margin-bottom:10px}
+  .qr .frame .scan-line{left:10px;right:10px}
+  .wave-viz{display:none}
+  .ticker-wrap{padding:6px 10px;margin-bottom:6px;min-height:auto}
+  .ticker{font-size:11px}
+  .cta{padding:10px;font-size:13px}
+  .recs-inside{padding:12px 14px 10px;margin-top:10px}
+  .recs-inside .rt{font-size:12px}
+  .ab{padding:8px 4px;font-size:9px}
+  .ab .ai{width:30px;height:30px;font-size:12px}
+  .card-wrap{margin-bottom:8px}
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}
