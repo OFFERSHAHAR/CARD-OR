@@ -50,7 +50,7 @@ body{
 @keyframes scrollDot{0%{opacity:1;top:4px}100%{opacity:0;top:12px}}
 @keyframes hintFade{to{opacity:1}}
 /* ─── APP ─── */
-.app{position:relative;z-index:1;width:100%;max-width:400px;opacity:0;animation:appearApp 0.8s 3.2s forwards}
+.app{position:relative;z-index:1;width:100%;max-width:400px;opacity:0;animation:appearApp 0.8s 4.3s forwards}
 @keyframes appearApp{to{opacity:1}}
 /* ─── TOP BAR ─── */
 .top-bar{display:flex;align-items:center;gap:10px;padding:8px 4px;margin-bottom:8px;opacity:0;animation:appearBar 0.8s 0.3s forwards}
@@ -70,7 +70,6 @@ img{-webkit-user-drag:none;user-select:none;pointer-events:none}
   transition:transform 0.7s cubic-bezier(.4,.08,.2,1);
   border-radius:calc(var(--card-rad) + 2px);
   will-change:transform;
-  animation:animalBreath 4.2s ease-in-out infinite;
   background:linear-gradient(135deg,rgba(255,255,255,0.12),rgba(255,255,255,0.04));
   padding:2px
 }
@@ -85,10 +84,6 @@ img{-webkit-user-drag:none;user-select:none;pointer-events:none}
 }
 .card.flipped{transform:rotateY(180deg);animation:none;padding:0;background:none}
 .card.flipped.card::before{opacity:0}
-@keyframes animalBreath{
-  0%,100%{transform:scale(1)}
-  50%{transform:scale(1.012)}
-}
 .card-face{
   backface-visibility:hidden;width:100%;border-radius:var(--card-rad);overflow:hidden;
   background:rgba(255,255,255,0.55);
@@ -688,7 +683,7 @@ img{-webkit-user-drag:none;user-select:none;pointer-events:none}
   position:fixed;inset:0;z-index:9999;
   background:linear-gradient(160deg,#0a1f33,#1a4060 40%,#2a5f7a 70%,#1a3a50);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  animation:splashFade 0.8s 3s forwards;pointer-events:none
+  animation:splashFade 0.8s 4.3s forwards;pointer-events:none
 }
 @keyframes splashFade{to{opacity:0;pointer-events:none}}
 #splash.hidden{opacity:0;pointer-events:none}
@@ -770,18 +765,6 @@ img{-webkit-user-drag:none;user-select:none;pointer-events:none}
   font-size:12px;color:rgba(255,255,255,0.35);font-weight:400;
   opacity:0;animation:textFadeIn 0.8s 1.2s forwards;letter-spacing:1px
 }
-.splash-tap{
-  position:absolute;bottom:60px;left:50%;transform:translateX(-50%);
-  font-size:13px;color:rgba(255,255,255,0.25);font-weight:400;
-  letter-spacing:1px;animation:tapPulse 2s ease-in-out infinite;
-  cursor:pointer;transition:color 0.3s;white-space:nowrap;
-  background:rgba(255,255,255,0.03);padding:10px 24px;border-radius:100px;
-  border:1px solid rgba(255,255,255,0.04)
-}
-.splash-tap:hover{color:rgba(255,255,255,0.4);border-color:rgba(255,255,255,0.08)}
-@keyframes tapPulse{0%,100%{opacity:0.4;transform:translateX(-50%) scale(1)}50%{opacity:0.7;transform:translateX(-50%) scale(1.03)}}
-.splash-tap.started{opacity:0;pointer-events:none;transition:opacity 0.5s}
-@keyframes textFadeIn{to{opacity:1}}
 .splash-particles{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .splash-particles span{
   position:absolute;width:3px;height:3px;border-radius:50%;background:#FFD700;
@@ -817,7 +800,6 @@ img{-webkit-user-drag:none;user-select:none;pointer-events:none}
   <div class="splash-text">สวัสดี</div>
   <div class="splash-welcome">ברוכים הבאים</div>
   <div class="splash-name">חנוך טירי | יועץ נסיעות לתאילנד</div>
-  <div class="splash-tap" id="splashTap">👆 הקש להתחלה</div>
 </div>
 
 <canvas id="canvas-bg"></canvas>
@@ -936,7 +918,7 @@ img{-webkit-user-drag:none;user-select:none;pointer-events:none}
 
 </div>
 
-<div class="scroll-hint"><span></span>כרטיס זה נוצר על ידי אור מוסה AGENT GUB GURU AI-DEV</div>
+<div class="scroll-hint" style="display:none"><span></span>כרטיס זה נוצר על ידי אור מוסה AGENT GUB GURU AI-DEV</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1068,26 +1050,30 @@ img{-webkit-user-drag:none;user-select:none;pointer-events:none}
   }
   animateParticles();
 
-  // ─── 3D TILT ───
+  // ─── 3D TILT + BREATHING ───
   const card = document.getElementById('card');
   const cardWrap = document.getElementById('cardWrap');
   let tiltEnabled = true;
+  let breathTime = 0;
 
   cardWrap.addEventListener('mousemove', e => {
     if (!tiltEnabled || card.classList.contains('flipped')) return;
     const rect = cardWrap.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
     const y = (e.clientY - rect.top) / rect.height;
-    card.style.transform = `rotateX(${(y-0.5)*-14}deg) rotateY(${(x-0.5)*14}deg) scale3d(1.025,1.025,1.025)`;
+    targetRX_mouse = (y-0.5)*-14;
+    targetRY_mouse = (x-0.5)*14;
   });
 
   cardWrap.addEventListener('mouseleave', () => {
     if (!tiltEnabled) return;
-    card.style.transform = '';
+    targetRX_mouse = 0;
+    targetRY_mouse = 0;
   });
 
   // ─── DEVICE ORIENTATION TILT ───
   let targetRX = 0, targetRY = 0, currentRX = 0, currentRY = 0;
+  let targetRX_mouse = 0, targetRY_mouse = 0;
   let orientationTilt = false;
 
   function handleOrientation(e) {
@@ -1096,19 +1082,27 @@ img{-webkit-user-drag:none;user-select:none;pointer-events:none}
     let b = e.beta || 0;
     g = Math.max(-45, Math.min(45, g));
     b = Math.max(-45, Math.min(45, b));
-    targetRY = (g / 45) * 14;
     targetRX = (b / 45) * -14;
+    targetRY = (g / 45) * 14;
     if (!orientationTilt) { orientationTilt = true; currentRX = targetRX; currentRY = targetRY; }
   }
 
   function tiltLoop() {
-    if (orientationTilt && tiltEnabled && !card.classList.contains('flipped')) {
-      currentRX += (targetRX - currentRX) * 0.12;
-      currentRY += (targetRY - currentRY) * 0.12;
-      if (Math.abs(currentRX) > 0.1 || Math.abs(currentRY) > 0.1) {
-        card.style.transform = `rotateX(${currentRX}deg) rotateY(${currentRY}deg) scale3d(1.025,1.025,1.025)`;
+    breathTime += 0.025;
+    const breath = 1 + Math.sin(breathTime * 1.5) * 0.006;
+
+    if (tiltEnabled && !card.classList.contains('flipped')) {
+      if (orientationTilt) {
+        currentRX += ((targetRX + targetRX_mouse) - currentRX) * 0.12;
+        currentRY += ((targetRY + targetRY_mouse) - currentRY) * 0.12;
       } else {
-        card.style.transform = '';
+        currentRX += (targetRX_mouse - currentRX) * 0.12;
+        currentRY += (targetRY_mouse - currentRY) * 0.12;
+      }
+      if (Math.abs(currentRX) > 0.05 || Math.abs(currentRY) > 0.05) {
+        card.style.transform = `rotateX(${currentRX}deg) rotateY(${currentRY}deg) scale3d(${breath},${breath},${breath})`;
+      } else {
+        card.style.transform = `scale3d(${breath},${breath},${breath})`;
       }
     }
     requestAnimationFrame(tiltLoop);
@@ -1160,14 +1154,14 @@ img{-webkit-user-drag:none;user-select:none;pointer-events:none}
     if (face === 'back' && !isFlipped) {
       card.classList.add('flipped');
       tiltEnabled = false;
-      card.style.transform = '';
-      card.style.animation = 'none';
+      currentRX = 0; currentRY = 0;
+      targetRX_mouse = 0; targetRY_mouse = 0;
+      card.style.transform = 'rotateY(180deg)';
     } else if (face === 'front' && isFlipped) {
       card.classList.remove('flipped');
-      tiltEnabled = true;
-      card.style.animation = '';
+      card.style.transform = '';
       void card.offsetHeight;
-      card.style.animation = 'animalBreath 4.2s ease-in-out infinite';
+      tiltEnabled = true;
     }
     triggerHeartbeat();
   }
@@ -1309,12 +1303,6 @@ img{-webkit-user-drag:none;user-select:none;pointer-events:none}
   setTimeout(syncH, 500);
   setTimeout(syncH, 1200);
 
-  // ─── SPLASH CLEANUP ───
-  setTimeout(() => {
-    const s = document.getElementById('splash');
-    if (s) { s.classList.add('hidden'); setTimeout(() => { if (s.parentNode) s.parentNode.removeChild(s); }, 800); }
-  }, 3500);
-
   // ─── 528 Hz TONE ───
   let audioCtx, toneGain, toneOsc, toneStarted = false;
 
@@ -1335,29 +1323,17 @@ img{-webkit-user-drag:none;user-select:none;pointer-events:none}
     } catch (e) {}
   }
 
-  // ─── SPLASH TAP TO START ───
-  const splashTap = document.getElementById('splashTap');
-  let splashStarted = false;
-
-  function startExperience(e) {
-    if (splashStarted) return;
-    splashStarted = true;
-    if (e && e.preventDefault) e.preventDefault();
-    if (splashTap) splashTap.classList.add('started');
+  // ─── SPLASH ───
+  function startSplash() {
     start528();
-    setTimeout(() => {
-      const s = document.getElementById('splash');
-      if (s) { s.classList.add('hidden'); setTimeout(() => { if (s.parentNode) s.parentNode.removeChild(s); }, 800); }
-    }, 3500);
   }
 
-  function onFirstTouch(e) {
-    startExperience(e);
-    document.removeEventListener('touchstart', onFirstTouch);
-    document.removeEventListener('click', onFirstTouch);
-  }
-  document.addEventListener('touchstart', onFirstTouch);
-  document.addEventListener('click', onFirstTouch);
+  // Auto-start splash experience on load
+  startSplash();
+  setTimeout(() => {
+    const s = document.getElementById('splash');
+    if (s) { s.classList.add('hidden'); setTimeout(() => { if (s.parentNode) s.parentNode.removeChild(s); }, 800); }
+  }, 4500);
 
   // ─── LOTUS ICON (PNG for home screen) ───
   function generateLotusIcon() {
