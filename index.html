@@ -811,6 +811,18 @@ img{-webkit-user-drag:none;user-select:none;pointer-events:none}
   70%{opacity:0.3;transform:translateY(-20px) scale(0.5)}
   100%{opacity:0;transform:translateY(-30px) scale(0)}
 }
+@keyframes textFadeIn{to{opacity:1}}
+.splash-tap{
+  position:absolute;bottom:60px;left:50%;transform:translateX(-50%);
+  font-size:13px;color:rgba(255,255,255,0.25);font-weight:400;
+  letter-spacing:1px;animation:tapPulse 2s ease-in-out infinite;
+  cursor:pointer;transition:color 0.3s;white-space:nowrap;
+  background:rgba(255,255,255,0.03);padding:10px 24px;border-radius:100px;
+  border:1px solid rgba(255,255,255,0.04)
+}
+.splash-tap:hover{color:rgba(255,255,255,0.4);border-color:rgba(255,255,255,0.08)}
+@keyframes tapPulse{0%,100%{opacity:0.4;transform:translateX(-50%) scale(1)}50%{opacity:0.7;transform:translateX(-50%) scale(1.03)}}
+.splash-tap.started{opacity:0;pointer-events:none;transition:opacity 0.5s}
 </style>
 </head>
 <body>
@@ -829,6 +841,7 @@ img{-webkit-user-drag:none;user-select:none;pointer-events:none}
   <div class="splash-text">สวัสดี</div>
   <div class="splash-welcome">ברוכים הבאים</div>
   <div class="splash-name">חנוך טירי | יועץ נסיעות לתאילנד</div>
+  <div class="splash-tap" id="splashTap">👆 הקש להתחלה</div>
 </div>
 
 <canvas id="canvas-bg"></canvas>
@@ -1352,17 +1365,29 @@ img{-webkit-user-drag:none;user-select:none;pointer-events:none}
     } catch (e) {}
   }
 
-  // ─── SPLASH ───
-  function startSplash() {
+  // ─── SPLASH TAP TO START ───
+  const splashTap = document.getElementById('splashTap');
+  let splashStarted = false;
+
+  function startExperience(e) {
+    if (splashStarted) return;
+    splashStarted = true;
+    if (e && e.preventDefault) e.preventDefault();
+    if (splashTap) splashTap.classList.add('started');
     start528();
+    setTimeout(() => {
+      const s = document.getElementById('splash');
+      if (s) { s.classList.add('hidden'); setTimeout(() => { if (s.parentNode) s.parentNode.removeChild(s); }, 800); }
+    }, 4500);
   }
 
-  // Auto-start splash experience on load
-  startSplash();
-  setTimeout(() => {
-    const s = document.getElementById('splash');
-    if (s) { s.classList.add('hidden'); setTimeout(() => { if (s.parentNode) s.parentNode.removeChild(s); }, 800); }
-  }, 4500);
+  function onFirstTouch(e) {
+    startExperience(e);
+    document.removeEventListener('touchstart', onFirstTouch);
+    document.removeEventListener('click', onFirstTouch);
+  }
+  document.addEventListener('touchstart', onFirstTouch);
+  document.addEventListener('click', onFirstTouch);
 
   // ─── LOTUS ICON (PNG for home screen) ───
   function generateLotusIcon() {
