@@ -1112,6 +1112,9 @@ img{-webkit-user-drag:none;user-select:none;pointer-events:none}
   let targetRX_mouse = 0, targetRY_mouse = 0;
   let orientationTilt = false;
 
+  let targetTX = 0, targetTY = 0, currentTX = 0, currentTY = 0;
+  let targetTX_mouse = 0, targetTY_mouse = 0;
+
   function handleOrientation(e) {
     if (!tiltEnabled || card.classList.contains('flipped')) return;
     let g = e.gamma || 0;
@@ -1120,7 +1123,9 @@ img{-webkit-user-drag:none;user-select:none;pointer-events:none}
     b = Math.max(-45, Math.min(45, b));
     targetRX = (b / 45) * -14;
     targetRY = (g / 45) * 14;
-    if (!orientationTilt) { orientationTilt = true; currentRX = targetRX; currentRY = targetRY; }
+    targetTX = (g / 45) * 8;
+    targetTY = (b / 45) * -8;
+    if (!orientationTilt) { orientationTilt = true; currentRX = targetRX; currentRY = targetRY; currentTX = targetTX; currentTY = targetTY; }
   }
 
   function tiltLoop() {
@@ -1131,12 +1136,16 @@ img{-webkit-user-drag:none;user-select:none;pointer-events:none}
       if (orientationTilt) {
         currentRX += ((targetRX + targetRX_mouse) - currentRX) * 0.12;
         currentRY += ((targetRY + targetRY_mouse) - currentRY) * 0.12;
+        currentTX += ((targetTX + targetTX_mouse) - currentTX) * 0.12;
+        currentTY += ((targetTY + targetTY_mouse) - currentTY) * 0.12;
       } else {
         currentRX += (targetRX_mouse - currentRX) * 0.12;
         currentRY += (targetRY_mouse - currentRY) * 0.12;
+        currentTX += (targetTX_mouse - currentTX) * 0.12;
+        currentTY += (targetTY_mouse - currentTY) * 0.12;
       }
       if (Math.abs(currentRX) > 0.05 || Math.abs(currentRY) > 0.05) {
-        card.style.transform = `rotateX(${currentRX}deg) rotateY(${currentRY}deg) scale3d(${breath},${breath},${breath})`;
+        card.style.transform = `translate(${currentTX}px,${currentTY}px) rotateX(${currentRX}deg) rotateY(${currentRY}deg) scale3d(${breath},${breath},${breath})`;
       } else {
         card.style.transform = `scale3d(${breath},${breath},${breath})`;
       }
